@@ -1,0 +1,19 @@
+# Dependencies
+node_modules/
+
+# Environment (secrets – do not commit)
+.env
+.env.local
+.env.*.local
+
+# OS
+.DS_Store
+
+# IDE
+.idea/
+
+# Build / output
+dist/
+build/
+coverage/
+*.log

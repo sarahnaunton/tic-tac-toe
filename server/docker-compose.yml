@@ -1,0 +1,23 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: tech_test_db
+    environment:
+      POSTGRES_USER: tech_test
+      POSTGRES_PASSWORD: tech_test
+      POSTGRES_DB: tech_test
+    ports:
+      - "5433:5432"
+    volumes:
+      - tech_test_pgdata:/var/lib/postgresql/data
+
+  adminer:
+    image: adminer
+    container_name: tech_test_adminer
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+
+volumes:
+  tech_test_pgdata:
