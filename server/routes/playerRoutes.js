@@ -1,5 +1,12 @@
 const express = require('express');
 const router = express.Router();
-const { models } = require('../db');
+const playerController = require('../controllers/playerController');
 
-module.exports = router;
+router.get('/', (req, res) => {
+  return playerController.getPlayers(req, res)
+})
+router.post('/', (req, res) => {
+  return playerController.createPlayer(req, res)
+})
+
+module.exports = router

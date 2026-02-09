@@ -1,5 +1,5 @@
 import React, { FunctionComponent } from 'react'
-import { Cell } from '../../types'
+import { Cell } from '../types'
 
 export const Square: FunctionComponent<{ value: Cell, onClick: () => void }> = ({ value, onClick }) => {
   return (

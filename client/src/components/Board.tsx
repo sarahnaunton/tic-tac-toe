@@ -1,6 +1,6 @@
 import React, { FunctionComponent } from 'react'
-import { Square } from './square'
-import { Grid } from '../../types'
+import { Square } from './Square'
+import { Grid } from '../types'
 
 export const Board: FunctionComponent<{ board: Grid, onSquareClick: (rowIndex: number, colIndex: number) => void }> = ({ board, onSquareClick }) => {
   return (

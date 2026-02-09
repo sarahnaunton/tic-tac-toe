@@ -1,27 +1,24 @@
-import React, { FunctionComponent, useState } from 'react'
-import { Board } from '../board/board'
-import { BoardSizeInput } from '../board/boardSizeInput'
-import { MIN_BOARD_SIZE } from '../../constants'
-import { Cell, Grid, XorO } from '../../types'
-import { getWinner } from '../../utils/getWinner'
+import React, { FunctionComponent, useState, useEffect } from 'react'
+import { Board } from './Board'
+import { Cell, Grid, XorO } from '../types'
+import { getWinner } from '../utils/getWinner'
 
 const createBoard = (size: number): Grid =>
   Array.from({ length: size }, () => Array.from({ length: size }, (): Cell => undefined))
 
-export const Game: FunctionComponent<{}> = () => {
-  const [boardSize, setBoardSize] = useState<number>(MIN_BOARD_SIZE)
-  const [board, setBoard] = useState<Grid>(() => createBoard(MIN_BOARD_SIZE))
+export const Game: FunctionComponent<{boardSize: number}> = ({ boardSize }) => {
+  const [board, setBoard] = useState<Grid>(() => createBoard(boardSize))
   const [currentPlayer, setCurrentPlayer] = useState<XorO>('X')
+
+  useEffect(() => {
+    setBoard(createBoard(boardSize))
+    setCurrentPlayer('X')
+  }, [boardSize])
+
   const winner = getWinner(board)
   const isWinner = winner !== null
   const isBoardFull = board.every((row) => row.every((cell) => cell !== undefined))
   const isDraw = !isWinner && isBoardFull
-
-  const handleBoardSizeChange = (size: number) => {
-    setBoardSize(size)
-    setBoard(createBoard(size))
-    setCurrentPlayer('X')
-  }
 
   const handleSquareClick = (rowIndex: number, colIndex: number) => {
     if (isWinner || isDraw) return
@@ -40,7 +37,6 @@ export const Game: FunctionComponent<{}> = () => {
 
   return (
     <div className='flex flex-col gap-1'>
-      <BoardSizeInput value={boardSize} onChange={handleBoardSizeChange} />
       {!isWinner && !isDraw && <div className='font-bold'>Next Player: {currentPlayer}</div>}
       {isWinner && <div className='font-bold'>Player {winner} has won!</div>}
       {isDraw && <div className='font-bold'>It was a draw</div>}
