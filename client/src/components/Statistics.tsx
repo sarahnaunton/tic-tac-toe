@@ -2,20 +2,26 @@ import React, { FunctionComponent, useEffect, useState } from 'react'
 import type { Player } from '../services/player/player.types'
 import type { PlayerWithStats } from '../services/player/player.types'
 import { getPlayer } from '../services/player/player.service'
+import { getErrorMessage } from '../utils/getErrorMessage'
 
 export const Statistics: FunctionComponent<{ players: Player[] }> = ({ players }) => {
   const [playersWithStats, setPlayersWithStats] = useState<PlayerWithStats[]>([])
+  const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
   useEffect(() => {
-    let cancelled = false
     const run = async () => {
-      const results = await Promise.all(
-        players.map((player) => getPlayer(player.id, true) as Promise<PlayerWithStats>)
-      )
-      if (!cancelled) setPlayersWithStats(results)
+      setErrorMessage(null)
+      try {
+        const results = await Promise.all(
+          players.map((player) => getPlayer(player.id, true) as Promise<PlayerWithStats>)
+        )
+        setPlayersWithStats(results)
+      } catch (error) {
+        setErrorMessage(getErrorMessage(error))
+        console.error('Error loading stats', error)
+      }
     }
     run()
-    return () => { cancelled = true }
   }, [players])
 
   return (
@@ -31,6 +37,9 @@ export const Statistics: FunctionComponent<{ players: Player[] }> = ({ players }
           </li>
         ))}
       </ul>
+      {errorMessage && (
+        <p className='text-red-600 text-sm mt-2' role='alert'>{errorMessage}</p>
+      )}
     </section>
   )
 }

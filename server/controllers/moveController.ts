@@ -33,7 +33,11 @@ export async function createMove(
     if (positionRow < 0 || positionRow >= boardSize || positionColumn < 0 || positionColumn >= boardSize) {
       return res.status(400).json({ error: 'Position is out of bounds' });
     }
-    
+
+    const existingMove = await models.move.findOne({ where: { gameId, positionRow, positionColumn } });
+    if (existingMove) {
+      return res.status(400).json({ error: 'That square has already been played' });
+    }
 
     const move = await models.move.create({
       gameId,

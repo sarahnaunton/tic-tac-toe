@@ -2,6 +2,7 @@ import React, { FunctionComponent, useEffect, useRef, useState } from 'react'
 import { Board } from './Board'
 import { Cell, Grid, XorO } from '../types'
 import { getWinner } from '../utils/getWinner'
+import { getErrorMessage } from '../utils/getErrorMessage'
 import { Game as GameType } from '../services/game/game.types'
 import { Player } from '../services/player/player.types'
 import { createMove } from '../services/move/move.service'
@@ -38,9 +39,11 @@ export const Game: FunctionComponent<{
   const [currentPlayerIndex, setCurrentPlayerIndex] = useState<number>(0)
   const currentPlayer = turnPlayers[currentPlayerIndex]
   const moveNumberRef = useRef(1)
+  const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
   const winner = getWinner(board)
   const isWinner = winner !== null
+  const winningPlayer = isWinner ? turnPlayers.find((p) => p.symbol === winner) : null
   const isBoardFull = board.every((row) => row.every((cell) => cell !== undefined))
   const isDraw = !isWinner && isBoardFull
   const isGameFinished = isWinner || isDraw
@@ -55,13 +58,15 @@ export const Game: FunctionComponent<{
         } else if (isDraw) {
           await completeGame(createdGame.id, 'DRAW')
         }
+        setErrorMessage(null)
         onGameComplete()
       } catch (error) {
+        setErrorMessage(getErrorMessage(error))
         console.error('Error completing game', error)
       }
     }
     run()
-  }, [isWinner, isDraw])
+  }, [isWinner, isDraw, winner, turnPlayers, createdGame.id, onGameComplete])
 
   const handleSquareClick = async (rowIndex: number, colIndex: number) => {
     if (isWinner || isDraw) return
@@ -77,10 +82,12 @@ export const Game: FunctionComponent<{
     }
     try {
       await createMove(move)
+      setErrorMessage(null)
     } catch (error) {
+      setErrorMessage(getErrorMessage(error))
       console.error('Error creating move', error)
+      return
     }
-  
 
     const newBoard = board.map((row, r) =>
       row.map((cell, c) => (r === rowIndex && c === colIndex ? currentPlayer.symbol : cell))
@@ -91,24 +98,28 @@ export const Game: FunctionComponent<{
   }
 
   const handleRestartGame = async () => {
+    setErrorMessage(null)
     try {
       if (!isGameFinished) {
         await abandonGame(createdGame.id)
       }
       onAbandon()
     } catch (error) {
+      setErrorMessage(getErrorMessage(error))
       console.error('Error abandoning game', error)
     }
   }
 
   return (
-    <div className='flex flex-col gap-1'>
+    <div className='flex flex-col gap-1 items-center'>
       {!isGameFinished && currentPlayer && (
         <div className='font-bold'>
-          Next Player: {currentPlayer.username} (Symbol: {currentPlayer.symbol})
+          Next Player: {currentPlayer.username}
         </div>
       )}
-      {isWinner && <div className='font-bold'>Player {winner} has won!</div>}
+      {isWinner && winningPlayer && (
+        <div className='font-bold'>{winningPlayer.username} has won!</div>
+      )}
       {isDraw && <div className='font-bold'>It was a draw</div>}
       <Board board={board} onSquareClick={handleSquareClick} />
       <button
@@ -118,6 +129,9 @@ export const Game: FunctionComponent<{
       >
         Restart Game
       </button>
+      {errorMessage && (
+        <p className='text-red-600 text-sm mt-2' role='alert'>{errorMessage}</p>
+      )}
     </div>
   )
 }

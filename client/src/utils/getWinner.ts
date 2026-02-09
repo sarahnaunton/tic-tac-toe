@@ -35,10 +35,12 @@ const getWinningLines = (size: number): Position[][] => {
 
 export const getWinner = (board: Grid): XorO | null => {
   const winningLines = getWinningLines(board.length)
+  
   for (const line of winningLines) {
     const values = line.map(([row, col]) => board[row][col])
     const first = values[0]
     if (first !== undefined && values.every((value) => value === first)) return first
   }
+  
   return null
 }

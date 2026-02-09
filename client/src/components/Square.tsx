@@ -1,7 +1,10 @@
 import React, { FunctionComponent } from 'react'
 import { Cell } from '../types'
 
-export const Square: FunctionComponent<{ value: Cell, onClick: () => void }> = ({ value, onClick }) => {
+export const Square: FunctionComponent<{ 
+  value: Cell, 
+  onClick: () => void 
+}> = ({ value, onClick }) => {
   return (
     <button
       type='button'

@@ -21,11 +21,55 @@ We want to store game results in a database.
 - Use any SQL database to store the results, please structure it in a relational manner and in a way for it to be expanded for future use cases 
 - Display simple stats back to the user including number of win and losses for each player
 
-## Quickstart
-- Make sure you have **node** installed
-- `cd client`
-- `npm i`
-- `npm start`
+## Getting started
+
+You need **Node.js** and **Docker** (for the database). Make sure ports 3000, 3001, and 5433 are free.
+
+### 1. Clone and start the database
+
+```bash
+git clone https://github.com/sarahnaunton/tic-tac-toe.git
+cd tic-tac-toe/server
+docker compose up -d
+```
+
+This starts PostgreSQL (port 5433) and Adminer (http://localhost:8080) if you want to inspect the DB.
+
+### 2. Backend
+
+From the project root (tic-tac-toe), run the following. If you're still in the server directory from step 1, run `cd ..` first.
+
+Create a `.env` file from the example (required for the server):
+
+```bash
+cd server
+cp .env.example .env
+```
+
+The default `.env` values match the Docker setup, so you don’t need to edit anything. Then:
+
+```bash
+npm i
+npx sequelize-cli db:migrate
+npm run dev
+```
+
+The API runs at http://localhost:3000.
+
+### 3. Frontend
+
+In a new terminal, go to the project root (tic-tac-toe), then run:
+
+Create a `.env` file from the example (optional; the app defaults to http://localhost:3000 for the API):
+
+```bash
+cd client
+cp .env.example .env
+npm i
+npm start
+```
+
+The app runs at http://localhost:3001. Open that URL, add two players, choose a board size, and play.
 
 ## Submission
 Once you are done please submit the public repo to your recruiter or invite nick@spruce.eco to your private repo and let your recruiter know. 

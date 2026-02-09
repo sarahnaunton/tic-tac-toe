@@ -3,7 +3,7 @@ import { NUMBER_OF_PLAYERS } from '../constants'
 import type { Player } from '../services/player/player.types'
 import { UserInput } from './UserInput'
 
-export const Users:FunctionComponent<{onDone: (players: Player[]) => void}> = ({ onDone }) => {
+export const Users: FunctionComponent<{ onDone: (players: Player[]) => void }> = ({ onDone }) => {
   const [players, setPlayers] = useState<Player[]>([])
   const [currentIndex, setCurrentIndex] = useState(0)
   const [error, setError] = useState<string | null>(null)

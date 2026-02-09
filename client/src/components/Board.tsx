@@ -2,7 +2,10 @@ import React, { FunctionComponent } from 'react'
 import { Square } from './Square'
 import { Grid } from '../types'
 
-export const Board: FunctionComponent<{ board: Grid, onSquareClick: (rowIndex: number, colIndex: number) => void }> = ({ board, onSquareClick }) => {
+export const Board: FunctionComponent<{
+  board: Grid,
+  onSquareClick: (rowIndex: number, colIndex: number) => void
+}> = ({ board, onSquareClick }) => {
   return (
     <div className='flex flex-col gap-1'>
       {board.map((row, rowIndex) => (

@@ -3,9 +3,7 @@ export interface Player {
   username: string,
 }
 
-export interface CreatePlayer {
-  username: string,
-}
+export type CreatePlayer = Omit<Player, 'id'>
 
 export interface PlayerWithStats  {
   id: string,

@@ -1,24 +1,30 @@
 import React, { FunctionComponent, useState } from 'react'
 import { getPlayers, createPlayer } from '../services/player/player.service'
 import type { Player } from '../services/player/player.types'
+import { getErrorMessage } from '../utils/getErrorMessage'
 
-
-export const UserInput: FunctionComponent<{playerNumber: number, onPlayerChosen: (player: Player) => void}> = ({ playerNumber, onPlayerChosen }) => {
+export const UserInput: FunctionComponent<{
+  playerNumber: number, 
+  onPlayerChosen: (player: Player) => void
+}> = ({ playerNumber, onPlayerChosen }) => {
   const [username, setUsername] = useState<string>('')
+  const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
   const handleAddPlayer = async () => {
-    const trimmedUsername = username.trim()
-    if (!trimmedUsername) return
+    if (!username) return
+    setErrorMessage(null)
     try {
-      const players = await getPlayers(`username=${encodeURIComponent(trimmedUsername)}`)
+      const players = await getPlayers(`username=${encodeURIComponent(username)}`)
       if (players.length > 0) {
         onPlayerChosen(players[0])
       } else {
-        const player = await createPlayer({ username: trimmedUsername })
+        const player = await createPlayer({ username })
         onPlayerChosen(player)
       }
+      setErrorMessage(null)
       setUsername('')
     } catch (error) {
+      setErrorMessage(getErrorMessage(error))
       console.error('Error adding player', error)
     }
   }
@@ -42,6 +48,9 @@ export const UserInput: FunctionComponent<{playerNumber: number, onPlayerChosen:
           Continue
         </button>
       </div>
+      {errorMessage && (
+        <p className='text-red-600 text-sm' role='alert'>{errorMessage}</p>
+      )}
     </div>
   )
 }
