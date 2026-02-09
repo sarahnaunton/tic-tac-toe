@@ -6,3 +6,12 @@ export interface Player {
 export interface CreatePlayer {
   username: string,
 }
+
+export interface PlayerWithStats  {
+  id: string,
+  username: string,
+  wins: number,
+  draws: number,
+  losses: number,
+}
+

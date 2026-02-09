@@ -14,12 +14,10 @@ app.get('/api/health', (req, res) => res.json({ ok: true }));
 const playerRoutes = require('./routes/playerRoutes');
 const gameRoutes = require('./routes/gameRoutes');
 const moveRoutes = require('./routes/moveRoutes');
-const gamePlayerRoutes = require('./routes/gamePlayerRoutes');
 
 app.use('/api/players', playerRoutes);
 app.use('/api/games', gameRoutes);
 app.use('/api/moves', moveRoutes);
-app.use('/api/game-players', gamePlayerRoutes);
 
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);

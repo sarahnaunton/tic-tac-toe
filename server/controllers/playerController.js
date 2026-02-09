@@ -40,7 +40,42 @@ async function createPlayer(req, res) {
   }
 }
 
+async function getPlayer(req, res) {
+  try {
+    const { playerId } = req.params
+    const player = await models.player.findByPk(playerId)
+    if (!player) {
+      return res.status(404).json({ error: 'Player not found' })
+    }
+    const response = player.toJSON()
+
+    if (req.query.includeStats === 'true') {
+      const gamePlayers = await models.gamePlayer.findAll({ where: { playerId } })
+      const gameIds = gamePlayers.map((gp) => gp.gameId)
+      let wins = 0
+      let draws = 0
+      let losses = 0
+      if (gameIds.length > 0) {
+        const games = await models.game.findAll({ where: { id: gameIds, status: 'COMPLETED' } })
+        for (const game of games) {
+          if (game.outcome === 'WIN' && game.winnerPlayerId === playerId) wins += 1
+          else if (game.outcome === 'WIN') losses += 1
+          else if (game.outcome === 'DRAW') draws += 1
+        }
+      }
+      response.wins = wins
+      response.draws = draws
+      response.losses = losses
+    }
+    return res.status(200).json(response)
+  } catch (error) {
+    console.error(error)
+    return res.status(500).json({ error: 'Internal server error' })
+  }
+}
+
 module.exports = {
   getPlayers,
-  createPlayer
+  createPlayer,
+  getPlayer
 }

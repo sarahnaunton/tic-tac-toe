@@ -9,7 +9,7 @@ async function createGame(req, res) {
     }
 
     if (!Array.isArray(playerSymbols) || playerSymbols.length === 0) {
-      return res.status(400).json({ error: 'playerSymbols must be a non-empty array' });
+      return res.status(400).json({ error: 'No players and their symbols have been provided' });
     }
 
     const seenPlayerIds = new Set();
@@ -26,8 +26,8 @@ async function createGame(req, res) {
     }
 
     const game = await sequelize.transaction(async (transaction) => {
-      const createdGame = await models.game.create({ boardSize: req.body.boardSize }, { transaction });
-      await models.gamePlayer.bulkCreate(
+      const createdGame = await models.game.create({ boardSize }, { transaction })
+      const gamePlayers = await models.gamePlayer.bulkCreate(
         playerSymbols.map((ps) => ({
           gameId: createdGame.id,
           playerId: ps.playerId,
@@ -36,9 +36,47 @@ async function createGame(req, res) {
         { transaction }
       )
 
-      return createdGame
-    });
+      return {
+        ...createdGame.toJSON(),
+        gamePlayers: gamePlayers.map((gp) => gp.toJSON())
+      }
+    })
     return res.status(201).json(game);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ error: 'Internal server error' });
+  }
+}
+
+async function abandonGame(req, res) {
+  try {
+    const game = await models.game.findByPk(req.params.gameId);
+    if (!game) {
+      return res.status(404).json({ error: 'Game not found' });
+    }
+    await game.update({ status: 'ABANDONED' });
+    return res.status(200).json(game);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ error: 'Internal server error' });
+  }
+}
+
+async function completeGame(req, res) {
+  try {
+    const { outcome, winnerPlayerId } = req.body;
+    if (!outcome || !['WIN', 'DRAW'].includes(outcome)) {
+      return res.status(400).json({ error: 'outcome must be WIN or DRAW' });
+    }
+    if (outcome === 'WIN' && !winnerPlayerId) {
+      return res.status(400).json({ error: 'winnerPlayerId is required when outcome is WIN' });
+    }
+    const game = await models.game.findByPk(req.params.gameId);
+    if (!game) {
+      return res.status(404).json({ error: 'Game not found' });
+    }
+    await game.update({ status: 'COMPLETED', outcome, completedAt: new Date(), winnerPlayerId });
+    return res.json(game);
   } catch (error) {
     console.error(error);
     return res.status(500).json({ error: 'Internal server error' });
@@ -47,4 +85,6 @@ async function createGame(req, res) {
 
 module.exports = {
   createGame,
+  abandonGame,
+  completeGame,
 };

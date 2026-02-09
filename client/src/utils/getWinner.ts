@@ -42,31 +42,3 @@ export const getWinner = (board: Grid): XorO | null => {
   }
   return null
 }
-
-
-
-// --- Original winning lines (3x3 only) ---
-// const winningLines: [number, number][][] = [
-//   // Rows: 123, 456, 789
-//   [[0, 0], [0, 1], [0, 2]],
-//   [[1, 0], [1, 1], [1, 2]],
-//   [[2, 0], [2, 1], [2, 2]],
-//   // Columns: 147, 258, 369
-//   [[0, 0], [1, 0], [2, 0]],
-//   [[0, 1], [1, 1], [2, 1]],
-//   [[0, 2], [1, 2], [2, 2]],
-//   // Diagonals: 159, 357
-//   [[0, 0], [1, 1], [2, 2]],
-//   [[0, 2], [1, 1], [2, 0]]
-// ]
-
-// --- Original getWinner (3x3 only) ---
-// export const getWinner = (board: Grid): XorO | null => {
-//   for (const [[r0, c0], [r1, c1], [r2, c2]] of winningLines) {
-//     const a = board[r0][c0]
-//     const b = board[r1][c1]
-//     const c = board[r2][c2]
-//     if (a !== undefined && a === b && b === c) return a
-//   }
-//   return null
-// }
